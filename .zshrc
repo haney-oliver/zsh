@@ -1,3 +1,5 @@
+autoload -U +X compinit && compinit
+autoload -U +X bashcompinit && bashcompinit 
 
 export XDG_CONFIG_HOME="/Users/ohaney/.config/"
 
@@ -34,7 +36,6 @@ if [ -f '/Users/ohaney/code/google-cloud-sdk/completion.zsh.inc' ]; then . '/Use
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
 export PYENV_VIRTUALENV_DISABLE_PROMPT=
 plugin=(
   pyenv
@@ -42,23 +43,6 @@ plugin=(
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-# Login to your user account in the AWS security account
-awslogin() {
-    while true; do
-        read "token_code?MFA token: "
-        break;
-    done
-    token_json="$(aws sts get-session-token --serial-number arn:aws:iam::157862151832:mfa/ohaney --token-code $token_code --profile user --output json)"
-    access_key_id=$(echo "$token_json" | jq -r .Credentials.AccessKeyId)
-    secret_access_key=$(echo "$token_json" | jq -r .Credentials.SecretAccessKey)
-    session_token=$(echo "$token_json" | jq -r .Credentials.SessionToken)
-
-    aws configure set aws_access_key_id "$access_key_id" --profile default
-    aws configure set aws_secret_access_key "$secret_access_key" --profile default
-    aws configure set aws_session_token "$session_token" --profile default
-}
-export JAVA_HOME=$(/usr/libexec/java_home)
-source ~/.aws/.aws-doctor-rc
 
 command -v flux >/dev/null && . <(flux completion zsh)
 
@@ -112,8 +96,6 @@ zinit snippet OMZP::kubectl
 zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
-# Load completions
-autoload -Uz compinit && compinit
 
 zinit cdreplay -q
 
@@ -130,7 +112,7 @@ bindkey '^[w' kill-region
 HISTSIZE=5000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
-HISTDUP=erase
+
 setopt appendhistory
 setopt sharehistory
 setopt hist_ignore_space
@@ -152,7 +134,7 @@ alias vim='nvim'
 alias c='clear'
 
 # Shell integrations
-# eval "$(fzf --zsh)"
-# eval "$(zoxide init --cmd cd zsh)"
+eval "$(fzf --zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 
 POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
